@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import express from 'express';
 
 class AppUpdater {
   constructor() {
@@ -56,6 +57,10 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
+const Store = require('electron-store');
+
+Store.initRenderer();
+
 const createWindow = async () => {
   if (isDebug) {
     await installExtensions();
@@ -93,6 +98,11 @@ const createWindow = async () => {
     } else {
       mainWindow.show();
     }
+  });
+
+  mainWindow.webContents.on('new-window', function(e, url) {
+    e.preventDefault();
+    require('electron').shell.openExternal(url);
   });
 
   mainWindow.on('closed', () => {
@@ -136,3 +146,18 @@ app
     });
   })
   .catch(console.log);
+  
+const expressServer = express();
+
+// Handling '/' Request
+expressServer.get('/access_token', (_req, _res) => {
+  _res.send("<html><body><script>fetch('http://localhost:1213/access_gathered?' + document.location.hash.slice(1)).then(() => window.close())</script></body></html>");
+});
+
+expressServer.get('/access_gathered', (_req, _res) => {
+  _res.send(_req.query);
+
+  mainWindow?.loadURL('http://localhost:1212/#' + _req.query.access_token);
+});
+
+expressServer.listen(1213);
