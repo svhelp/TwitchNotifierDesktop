@@ -1,14 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { sftApi } from 'api/sftApi'
+import { twitchApi } from 'api/twitchApi'
 import mainLayoutReducer from 'components/logic/slice'
 
 export const store = configureStore({
   reducer: {
-    [sftApi.reducerPath]: sftApi.reducer,
+    [twitchApi.reducerPath]: twitchApi.reducer,
     mainLayoutReducer,
   },
   middleware: getDefaultMiddleware => 
-    getDefaultMiddleware().concat(sftApi.middleware)
+    getDefaultMiddleware().concat(twitchApi.middleware)
 })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

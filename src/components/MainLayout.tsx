@@ -1,14 +1,20 @@
-import { useGetTagsQuery } from "api/sftApi"
+import { useGetFollowedStreamsQuery, useGetUsersQuery } from "api/twitchApi"
 import { CLIENT_ID } from "main/client-id"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import styled from "styled-components"
+import { isAuthenticated, setAuthToken } from "./logic/slice"
 
 export const MainLayout = () => {
+  const dispatch = useDispatch();
 
-  const [ accessToken, setAccessToken ] = useState('');
+  const isAuth = useSelector(isAuthenticated);
+
+  const { data: userData } = useGetUsersQuery({}, {skip: !isAuth});
+  const { data: streamsData } = useGetFollowedStreamsQuery({user_id: userData?.data[0]?.id ?? ""}, {skip: !userData});
 
   useEffect(() => {
-    const addressToken = document.location.hash;
+    const addressToken = document.location.hash.slice(1);
 
     if (!!addressToken){
       window.electron.store.set('accessToken', addressToken);
@@ -18,7 +24,7 @@ export const MainLayout = () => {
       ? addressToken
       : window.electron.store.get<string>('accessToken');
 
-    setAccessToken(token ?? '');
+    dispatch(setAuthToken(token));
   }, []);
   
   const home_url="http://localhost:1213/access_token"
@@ -32,11 +38,23 @@ export const MainLayout = () => {
       <span>{CLIENT_ID}</span>
     </InfoBlock>
     <InfoBlock>
-      <span>Access token:</span>
-      <span>{accessToken}</span>
+      <span>Is authenticated:</span>
+      <span>{isAuth.toString()}</span>
     </InfoBlock>
 
       <a target="_blank" href={authLink}>Log in</a>
+      
+    <InfoBlock>
+      <span>User ID:</span>
+      <span>{userData?.data[0]?.id}</span>
+    </InfoBlock>
+    
+    <InfoBlock>
+      <span>Streams:</span>
+      {streamsData?.data.map(s =>
+        <span>{s.user_login}</span>)}
+      
+    </InfoBlock>
   </div>
 }
 
