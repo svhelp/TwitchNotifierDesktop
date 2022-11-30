@@ -1,35 +1,31 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createDraftSafeSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
+import { RootState } from 'renderer/store';
 
 export interface MainLayoutState {
-  value: number
+  authToken?: string;
 }
 
 const initialState: MainLayoutState = {
-  value: 0,
+  authToken: undefined,
 }
 
 export const mainLayoutSlice = createSlice({
   name: 'counter',
   initialState,
   reducers: {
-    increment: (state) => {
-      // Redux Toolkit allows us to write "mutating" logic in reducers. It
-      // doesn't actually mutate the state because it uses the Immer library,
-      // which detects changes to a "draft state" and produces a brand new
-      // immutable state based off those changes
-      state.value += 1
-    },
-    decrement: (state) => {
-      state.value -= 1
-    },
-    incrementByAmount: (state, action: PayloadAction<number>) => {
-      state.value += action.payload
+    setAuthToken: (state, action: PayloadAction<string | undefined>) => {
+      state.authToken = action.payload;
     },
   },
 })
 
+export const isAuthenticated = createDraftSafeSelector(
+  (state: RootState) => state.mainLayoutReducer,
+  (state) => !!state.authToken
+)
+
 // Action creators are generated for each case reducer function
-export const { increment, decrement, incrementByAmount } = mainLayoutSlice.actions
+export const { setAuthToken } = mainLayoutSlice.actions
 
 export default mainLayoutSlice.reducer
