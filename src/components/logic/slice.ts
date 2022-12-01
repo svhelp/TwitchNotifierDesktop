@@ -17,6 +17,9 @@ export const mainLayoutSlice = createSlice({
     setAuthToken: (state, action: PayloadAction<string | undefined>) => {
       state.authToken = action.payload;
     },
+    logOut: (state) => {
+      state.authToken = undefined;
+    },
   },
 })
 
@@ -26,6 +29,6 @@ export const isAuthenticated = createDraftSafeSelector(
 )
 
 // Action creators are generated for each case reducer function
-export const { setAuthToken } = mainLayoutSlice.actions
+export const { setAuthToken, logOut } = mainLayoutSlice.actions
 
 export default mainLayoutSlice.reducer
