@@ -64,7 +64,7 @@ type Pagination = {
     cursor: string;
 }
 
-interface IUserInfo {
+export interface IUserInfo {
     id: string;
     login: string;
     display_name: string;
@@ -77,7 +77,7 @@ interface IUserInfo {
     created_at: string;
 }
 
-interface IStreamInfo {
+export interface IStreamInfo {
     id: string;
     user_id: string;
     user_login: string;

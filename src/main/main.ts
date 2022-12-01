@@ -149,15 +149,40 @@ app
   
 const expressServer = express();
 
-// Handling '/' Request
-expressServer.get('/access_token', (_req, _res) => {
-  _res.send("<html><body><script>fetch('http://localhost:1213/access_gathered?' + document.location.hash.slice(1)).then(() => window.close())</script></body></html>");
-});
+expressServer.use(express.static(path.resolve(__dirname, '../renderer')));
+
+if (process.env.NODE_ENV !== 'production'){
+  var cors = require('cors');
+
+  expressServer.use(cors({
+    origin: 'http://localhost:1212'
+  }));
+
+  expressServer.get('/auth*', (_req, _res) => {
+    _res.redirect('http://localhost:1212/auth.html');
+  });
+}
+
+// // Handling '/' Request
+// expressServer.get('/access_token', (_req, _res) => {
+//   if (process.env.NODE_ENV !== 'production') {
+//     _res.redirect('http://localhost:1212/auth.html');
+//   }
+
+//   _res.sendFile(path.resolve(__dirname, '../renderer/', 'auth.html'))
+// });
 
 expressServer.get('/access_gathered', (_req, _res) => {
-  _res.send(_req.query);
+  _res.status(200);
+  _res.send();
 
-  mainWindow?.loadURL('http://localhost:1212/#' + _req.query.access_token);
+  console.log("***Got access token");
+
+  const store = new Store();
+  store.set('accessToken', _req.query.access_token);
+  
+  mainWindow?.reload();
+  mainWindow?.focus();
 });
 
 expressServer.listen(1213);

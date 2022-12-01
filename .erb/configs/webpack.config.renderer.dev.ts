@@ -38,6 +38,31 @@ if (
   execSync('npm run postinstall');
 }
 
+const components = ["index", "auth"];
+
+const entry = components.reduce((entries, componentName) => {
+	entries[componentName] = path.join(webpackPaths.srcRendererPath, `${componentName}.tsx`);
+	return entries;
+}, {});
+
+const htmlGenerators = components.reduce((entries, componentName) => {
+	entries.push(new HtmlWebpackPlugin({
+    filename: `${componentName}.html`,
+    template: path.join(webpackPaths.srcRendererPath, `${componentName}.ejs`),
+    excludeChunks: components.filter(cName => cName !== componentName),
+    minify: {
+      collapseWhitespace: true,
+      removeAttributeQuotes: true,
+      removeComments: true,
+    },
+    isBrowser: false,
+    env: process.env.NODE_ENV,
+    isDevelopment: process.env.NODE_ENV !== 'production',
+    nodeModules: webpackPaths.appNodeModulesPath,
+  }));
+	return entries;
+}, [] as HtmlWebpackPlugin[]);
+
 const configuration: webpack.Configuration = {
   devtool: 'inline-source-map',
 
@@ -45,19 +70,24 @@ const configuration: webpack.Configuration = {
 
   target: ['web', 'electron-renderer'],
 
-  entry: [
-    `webpack-dev-server/client?http://localhost:${port}/dist`,
-    'webpack/hot/only-dev-server',
-    path.join(webpackPaths.srcRendererPath, 'index.tsx'),
-  ],
+  entry: {
+    default: `webpack-dev-server/client?http://localhost:${port}/dist`,
+    'hot-dev-server': 'webpack/hot/only-dev-server',
+    ...entry
+  },
 
   output: {
+    
     path: webpackPaths.distRendererPath,
     publicPath: '/',
-    filename: 'renderer.dev.js',
+    filename: '[name].dev.js',
     library: {
       type: 'umd',
     },
+  },
+
+  optimization: {
+    runtimeChunk: 'single',
   },
 
   module: {
@@ -130,19 +160,7 @@ const configuration: webpack.Configuration = {
 
     new ReactRefreshWebpackPlugin(),
 
-    new HtmlWebpackPlugin({
-      filename: path.join('index.html'),
-      template: path.join(webpackPaths.srcRendererPath, 'index.ejs'),
-      minify: {
-        collapseWhitespace: true,
-        removeAttributeQuotes: true,
-        removeComments: true,
-      },
-      isBrowser: false,
-      env: process.env.NODE_ENV,
-      isDevelopment: process.env.NODE_ENV !== 'production',
-      nodeModules: webpackPaths.appNodeModulesPath,
-    }),
+    ...htmlGenerators,
   ],
 
   node: {

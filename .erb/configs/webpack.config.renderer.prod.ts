@@ -18,6 +18,29 @@ import deleteSourceMaps from '../scripts/delete-source-maps';
 checkNodeEnv('production');
 deleteSourceMaps();
 
+const components = ["index", "auth"];
+
+const entry = components.reduce((entries, componentName) => {
+	entries[componentName] = path.join(webpackPaths.srcRendererPath, `${componentName}.tsx`);
+	return entries;
+}, {});
+
+const htmlGenerators = components.reduce((entries, componentName) => {
+	entries.push(new HtmlWebpackPlugin({
+      filename: `${componentName}.html`,
+      template: path.join(webpackPaths.srcRendererPath, `${componentName}.ejs`),
+      chunks: [componentName],
+      minify: {
+        collapseWhitespace: true,
+        removeAttributeQuotes: true,
+        removeComments: true,
+      },
+      isBrowser: false,
+      isDevelopment: process.env.NODE_ENV !== 'production',
+    }));
+	return entries;
+}, [] as HtmlWebpackPlugin[]);
+
 const configuration: webpack.Configuration = {
   devtool: 'source-map',
 
@@ -25,12 +48,12 @@ const configuration: webpack.Configuration = {
 
   target: ['web', 'electron-renderer'],
 
-  entry: [path.join(webpackPaths.srcRendererPath, 'index.tsx')],
+  entry,
 
   output: {
     path: webpackPaths.distRendererPath,
     publicPath: './',
-    filename: 'renderer.js',
+    filename: '[name].js',
     library: {
       type: 'umd',
     },
@@ -73,6 +96,7 @@ const configuration: webpack.Configuration = {
   },
 
   optimization: {
+    runtimeChunk: 'single',
     minimize: true,
     minimizer: [
       new TerserPlugin({
@@ -105,17 +129,7 @@ const configuration: webpack.Configuration = {
       analyzerMode: process.env.ANALYZE === 'true' ? 'server' : 'disabled',
     }),
 
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: path.join(webpackPaths.srcRendererPath, 'index.ejs'),
-      minify: {
-        collapseWhitespace: true,
-        removeAttributeQuotes: true,
-        removeComments: true,
-      },
-      isBrowser: false,
-      isDevelopment: process.env.NODE_ENV !== 'production',
-    }),
+    ...htmlGenerators,
 
     new webpack.DefinePlugin({
       'process.type': '"renderer"',
