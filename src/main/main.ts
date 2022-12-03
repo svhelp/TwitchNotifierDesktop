@@ -15,6 +15,7 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import express from 'express';
+import { initAccessToken, updateAccessToken } from './tokenStorage';
 
 class AppUpdater {
   constructor() {
@@ -25,12 +26,6 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -57,9 +52,6 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
-const Store = require('electron-store');
-
-Store.initRenderer();
 
 const createWindow = async () => {
   if (isDebug) {
@@ -146,7 +138,11 @@ app
     });
   })
   .catch(console.log);
-  
+
+ipcMain.on('request_token', async (event) => {
+  event.reply('token_updated', initAccessToken());
+});
+
 const expressServer = express();
 
 expressServer.use(express.static(path.resolve(__dirname, '../renderer')));
@@ -163,26 +159,21 @@ if (process.env.NODE_ENV !== 'production'){
   });
 }
 
-// // Handling '/' Request
-// expressServer.get('/access_token', (_req, _res) => {
-//   if (process.env.NODE_ENV !== 'production') {
-//     _res.redirect('http://localhost:1212/auth.html');
-//   }
-
-//   _res.sendFile(path.resolve(__dirname, '../renderer/', 'auth.html'))
-// });
-
 expressServer.get('/access_gathered', (_req, _res) => {
   _res.status(200);
   _res.send();
 
   console.log("***Got access token");
 
-  const store = new Store();
-  store.set('accessToken', _req.query.access_token);
-  
-  mainWindow?.reload();
-  mainWindow?.focus();
+  const token = _req.query.access_token as string;
+  updateAccessToken(token);
+
+  if (!mainWindow){
+    return;
+  }
+
+  mainWindow.webContents.send("token_updated", token);
+  mainWindow.focus();
 });
 
 expressServer.listen(1213);
