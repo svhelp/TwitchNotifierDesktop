@@ -41,7 +41,7 @@ const HeaderCaption = styled.h1`
   margin: 0;
 `
 
-const UserLink = styled.a`
+const UserLink = styled.span`
   margin-left: 8px;
 
   color: #323232;
