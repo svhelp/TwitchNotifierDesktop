@@ -14,6 +14,7 @@ export const StreamInfo = (props: IStreamInfoProps) => {
     return (
         <Card
             style={{ width: 500, margin: "4px" }}
+            onClick={() => window.open(`https://twitch.tv/${stream.user_login}`, '_blank', 'noopener,noreferrer')}
             hoverable
         >
             <Meta
