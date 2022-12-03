@@ -7,7 +7,7 @@ export const useLogOut = () => {
     const dispatch = useDispatch();
     
     const onLogOut = () => {
-        window.electron.store.set('accessToken', '');
+        window.electron.store.removeAccessToken();
         dispatch(logOut());
         navigate("/auth");
     }

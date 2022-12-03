@@ -7,18 +7,17 @@ import { store } from './store';
 const container = document.getElementById('root')!;
 const root = createRoot(container);
 
-const token = window.electron.store.get<string>('accessToken');
-store.dispatch(setAuthToken(token));
-
 root.render(
   <Provider store={store}>
     <App />
   </Provider>
 );
 
-// // calling IPC exposed from preload script
-// window.electron.ipcRenderer.once('ipc-example', (arg) => {
-//   // eslint-disable-next-line no-console
-//   console.log(arg);
-// });
-// window.electron.ipcRenderer.sendMessage('ipc-example', ['ping']);
+window.electron.ipcRenderer.sendMessage('request_token', []);
+window.electron.ipcRenderer.on('token_updated', (arg) => {
+  if (!arg){
+    return;
+  }
+
+  store.dispatch(setAuthToken(arg as string));
+});
