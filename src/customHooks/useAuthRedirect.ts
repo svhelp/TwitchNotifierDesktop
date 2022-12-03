@@ -10,9 +10,9 @@ export const useAuthRedirect = () => {
   
   useEffect(() => {
     if (isAuth) {
-      navigate("/");
+      navigate("/index");
     } else {
-      navigate("/auth");
+      navigate("/");
     }
   }, [ isAuth, navigate ]);
 }

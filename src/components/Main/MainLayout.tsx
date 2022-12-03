@@ -1,36 +1,21 @@
+import { Layout } from "antd"
+import { Header, Content } from "antd/es/layout/layout"
 import { useAuthRedirect } from "customHooks/useAuthRedirect"
-import { useLogOut } from "customHooks/useLogOut"
-import { useUserData } from "customHooks/useUserData"
-import { CLIENT_ID } from "main/client-id"
-import styled from "styled-components"
-import { StreamList } from "../Streams/StreamList"
+import { HeaderContent } from "./Header/Header"
+import { StreamList } from "./Streams/StreamList"
 
 export const MainLayout = () => {
   useAuthRedirect();
 
-  const { data: userData, isLoading } = useUserData();
-
-  const onLogOut = useLogOut();
-
-  return <div>
-    <InfoBlock>
-      <span>Client ID:</span>
-      <span>{CLIENT_ID}</span>
-    </InfoBlock>
-
-    <button onClick={onLogOut}>
-      Log out
-    </button>
-      
-    <InfoBlock>
-      <span>User ID:</span>
-      <span>{userData?.data[0]?.id}</span>
-    </InfoBlock>
-    
-    <StreamList />
-  </div>
+  return (
+    <Layout className="site-layout">
+      <Header style={{ background: "white" }}>
+        <HeaderContent />
+      </Header>
+      <Content>
+        <StreamList />
+      </Content>
+    </Layout>
+  )
 }
 
-const InfoBlock = styled.div`
-  display: flex;
-`

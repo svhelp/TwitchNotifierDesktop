@@ -9,7 +9,7 @@ export const useLogOut = () => {
     const onLogOut = () => {
         window.electron.store.removeAccessToken();
         dispatch(logOut());
-        navigate("/auth");
+        navigate("/");
     }
 
     return onLogOut;
