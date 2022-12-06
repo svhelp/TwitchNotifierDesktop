@@ -1,3 +1,4 @@
+import { GetFollowedStreamsApiResponse, GetUsersApiResponse } from "api/models";
 import axios from "axios";
 import { CLIENT_ID } from "./client-id";
 import { initAccessToken } from "./tokenStorage";
@@ -10,12 +11,12 @@ const getHeaders = (token: string) => ({
 
 const fetchUserData = (token: string) => {
     console.log("***Fetch user sent.");
-    return axios.get('https://api.twitch.tv/helix/users', getHeaders(token))
+    return axios.get<GetUsersApiResponse>('https://api.twitch.tv/helix/users', getHeaders(token))
 }
 
 const fetchStreamsData = (token: string, userId: string) => {
     console.log("***Fetch streams sent.");
-    return axios.get('https://api.twitch.tv/helix/streams/followed', {
+    return axios.get<GetFollowedStreamsApiResponse>('https://api.twitch.tv/helix/streams/followed', {
         ...getHeaders(token),
         params: {user_id: userId}
     })

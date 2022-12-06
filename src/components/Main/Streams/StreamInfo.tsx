@@ -1,6 +1,7 @@
 import { Avatar, Card } from "antd"
 import Meta from "antd/es/card/Meta"
-import { IStreamInfo, useGetUsersQuery } from "api/twitchApi"
+import { IStreamInfo } from "api/models";
+import { useGetUsersQuery } from "api/twitchApi"
 
 interface IStreamInfoProps {
     stream: IStreamInfo;
