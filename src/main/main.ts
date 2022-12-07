@@ -15,7 +15,7 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import express from 'express';
-import { initAccessToken, updateAccessToken } from './tokenStorage';
+import { initAccessToken, removeAccessToken, updateAccessToken } from './tokenStorage';
 import { initNotifierCore, INotifierCore } from './notifier-core';
 
 class AppUpdater {
@@ -148,6 +148,10 @@ ipcMain.on('request_token', async (event) => {
   event.reply('token_updated', initAccessToken());
 });
 
+ipcMain.on('remove_token', async () => {
+  notifier.stopPolling();
+  removeAccessToken();
+});
 
 const expressServer = express();
 
@@ -173,6 +177,7 @@ expressServer.get('/access_gathered', (_req, _res) => {
 
   const token = _req.query.access_token as string;
 
+  notifier.updateToken(token);
   updateAccessToken(token);
 
   if (!mainWindow){

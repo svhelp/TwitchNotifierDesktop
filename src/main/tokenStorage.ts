@@ -24,7 +24,6 @@ export const updateAccessToken = (value: string | undefined) => {
         writeStorage(storageTokenKey, encryptedToken);
     }
 
-    console.log("Token updated: " + value);
     ipcMain.emit("token_updated", value);
 };
 
