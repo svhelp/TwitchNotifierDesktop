@@ -16,6 +16,7 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import express from 'express';
 import { initAccessToken, updateAccessToken } from './tokenStorage';
+import { initNotifierCore, INotifierCore } from './notifier-core';
 
 class AppUpdater {
   constructor() {
@@ -25,6 +26,7 @@ class AppUpdater {
   }
 }
 
+let notifier: INotifierCore;
 let mainWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -124,12 +126,15 @@ app.on('window-all-closed', () => {
   // after all windows have been closed
   if (process.platform !== 'darwin') {
     app.quit();
+    notifier.stopPolling();
   }
 });
 
 app
   .whenReady()
   .then(() => {
+    notifier = initNotifierCore();
+
     createWindow();
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
@@ -142,6 +147,7 @@ app
 ipcMain.on('request_token', async (event) => {
   event.reply('token_updated', initAccessToken());
 });
+
 
 const expressServer = express();
 
@@ -166,6 +172,7 @@ expressServer.get('/access_gathered', (_req, _res) => {
   console.log("***Got access token");
 
   const token = _req.query.access_token as string;
+
   updateAccessToken(token);
 
   if (!mainWindow){
