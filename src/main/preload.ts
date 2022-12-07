@@ -1,14 +1,8 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import { removeAccessToken } from './tokenStorage';
 
-export type Channels = 'request_token' | 'token_updated';
+export type Channels = 'remove_token' | 'request_token' | 'token_updated';
 
 contextBridge.exposeInMainWorld('electron', {
-  store: {
-    removeAccessToken() {
-      removeAccessToken();
-    },
-  },
   ipcRenderer: {
     sendMessage(channel: Channels, args: unknown[]) {
       ipcRenderer.send(channel, args);

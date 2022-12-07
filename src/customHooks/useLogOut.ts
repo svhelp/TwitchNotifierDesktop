@@ -7,7 +7,7 @@ export const useLogOut = () => {
     const dispatch = useDispatch();
     
     const onLogOut = () => {
-        window.electron.store.removeAccessToken();
+        window.electron.ipcRenderer.sendMessage('remove_token', [])
         dispatch(logOut());
         navigate("/");
     }

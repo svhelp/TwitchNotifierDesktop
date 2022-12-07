@@ -128,19 +128,21 @@ export const initNotifierCore = () => {
 
     const stopPolling = () => {
         log("Stop polling.");
-        pollingInterval = undefined;
+        clearInterval(pollingInterval);
     }
 
     const updateToken = async (newToken: string | undefined) => {
         log("Update token.");
-        stopPolling();
 
         accessToken = newToken;
 
-        if (!!accessToken){
-            log("Start polling.");
-            pollingInterval = await startPolling(accessToken);
+        if (!accessToken){
+            stopPolling();
+            return;
         }
+
+        log("Start polling.");
+        pollingInterval = await startPolling(accessToken);
     }
 
     updateToken(initAccessToken());
