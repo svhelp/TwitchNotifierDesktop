@@ -9,11 +9,11 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, Tray, Menu } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
+import { getAssetPath, resolveHtmlPath } from './util';
 import express from 'express';
 import { initAccessToken, removeAccessToken, updateAccessToken } from './tokenStorage';
 import { initNotifierCore, INotifierCore } from './notifier-core';
@@ -27,6 +27,8 @@ class AppUpdater {
 }
 
 let notifier: INotifierCore;
+let tray: Tray;
+let isQuiting: boolean;
 let mainWindow: BrowserWindow | null = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -60,19 +62,11 @@ const createWindow = async () => {
     await installExtensions();
   }
 
-  const RESOURCES_PATH = app.isPackaged
-    ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets');
-
-  const getAssetPath = (...paths: string[]): string => {
-    return path.join(RESOURCES_PATH, ...paths);
-  };
-
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
     height: 728,
-    icon: getAssetPath('icon.png'),
+    icon: getAssetPath(app, 'icon.png'),
     webPreferences: {
       sandbox: false,
       preload: app.isPackaged
@@ -87,12 +81,27 @@ const createWindow = async () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
     }
+
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize();
     } else {
       mainWindow.show();
     }
   });
+
+  mainWindow.on('close', event => {
+    if (!mainWindow) {
+      throw new Error('"mainWindow" is not defined');
+    }
+
+    if (isQuiting) {
+      return;
+    }
+    
+    event.preventDefault();
+    mainWindow.hide();
+    event.returnValue = false;
+  })
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -116,21 +125,47 @@ const createWindow = async () => {
  * Add event listeners...
  */
 
-app.on('window-all-closed', () => {
-  // Respect the OSX convention of having the application in memory even
-  // after all windows have been closed
-  if (process.platform !== 'darwin') {
-    app.quit();
-    notifier.stopPolling();
-  }
+app.on('before-quit', () => {
+  isQuiting = true;
+
+  notifier.stopPolling();
+  tray.destroy();
 });
 
 app
   .whenReady()
   .then(() => {
     notifier = initNotifierCore();
+    
+    tray = new Tray(getAssetPath(app, 'icon.ico'))
+
+    const contextMenu = Menu.buildFromTemplate([
+      { label: 'Open', click: () => {
+        if (!mainWindow){
+          return;
+        }
+
+        mainWindow.show();
+      }},
+      { label: 'Quit', click: () => {
+        isQuiting = true;
+        app.quit();
+      }}
+    ])
+
+    tray.on('double-click', () => {
+      if (!mainWindow){
+        return;
+      }
+
+      mainWindow.show();
+    })
+    
+    tray.setToolTip('Twitch Notifier')
+    tray.setContextMenu(contextMenu)
 
     createWindow();
+
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
@@ -152,7 +187,7 @@ const expressServer = express();
 
 expressServer.use(express.static(path.resolve(__dirname, '../renderer')));
 
-if (process.env.NODE_ENV !== 'production'){
+if (isDebug){
   var cors = require('cors');
 
   expressServer.use(cors({
