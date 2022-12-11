@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { CLIENT_ID } from "main/client-id";
+import { CLIENT_ID } from "constants/client-id";
 import { RootState } from "renderer/store";
 import { GetUsersApiResponse, GetUsersApiModel, GetFollowedStreamsApiResponse, GetFollowedStreamsApiModel } from "./models";
 

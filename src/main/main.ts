@@ -10,26 +10,27 @@
  */
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain, Tray, Menu } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
-import MenuBuilder from './menu';
-import { getAssetPath, resolveHtmlPath } from './util';
-import express from 'express';
-import { initAccessToken, removeAccessToken, updateAccessToken } from './tokenStorage';
-import { initNotifierCore, INotifierCore } from './notifier-core';
+import { getAssetPath, resolveHtmlPath } from './utils/path-utils';
+import { initAccessToken, removeAccessToken } from './modules/token-storage';
+import { initNotifierCore } from './modules/notifier-core';
+import { startServer } from './modules/auth-server';
+import { IAppContainer } from './interfaces';
 
-class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
+// class AppUpdater {
+//   constructor() {
+//     log.transports.file.level = 'info';
+//     autoUpdater.logger = log;
+//     autoUpdater.checkForUpdatesAndNotify();
+//   }
+// }
 
-let notifier: INotifierCore;
-let tray: Tray;
 let isQuiting: boolean;
-let mainWindow: BrowserWindow | null = null;
+
+const appContainer: IAppContainer = {
+  mainWindow: null,
+  notifier: null,
+  tray: null
+}
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -56,13 +57,43 @@ const installExtensions = async () => {
     .catch(console.log);
 };
 
+const createTray = () => {
+  const tray = new Tray(getAssetPath(app, 'icon.ico'))
+
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'Open', click: () => {
+      if (!appContainer.mainWindow){
+        return;
+      }
+
+      appContainer.mainWindow.show();
+    }},
+    { label: 'Quit', click: () => {
+      isQuiting = true;
+      app.quit();
+    }}
+  ])
+
+  tray.on('double-click', () => {
+    if (!appContainer.mainWindow){
+      return;
+    }
+
+    appContainer.mainWindow.show();
+  })
+  
+  tray.setToolTip('Twitch Notifier')
+  tray.setContextMenu(contextMenu)
+
+  return tray;
+}
 
 const createWindow = async () => {
   if (isDebug) {
     await installExtensions();
   }
 
-  mainWindow = new BrowserWindow({
+  const mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
     height: 728,
@@ -98,17 +129,16 @@ const createWindow = async () => {
       return;
     }
     
+    console.log("***Quit prevented")
+    
     event.preventDefault();
     mainWindow.hide();
     event.returnValue = false;
   })
 
   mainWindow.on('closed', () => {
-    mainWindow = null;
+    appContainer.mainWindow = null;
   });
-
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
 
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
@@ -118,7 +148,9 @@ const createWindow = async () => {
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
-  new AppUpdater();
+  // new AppUpdater();
+
+  return mainWindow;
 };
 
 /**
@@ -128,94 +160,36 @@ const createWindow = async () => {
 app.on('before-quit', () => {
   isQuiting = true;
 
-  notifier.stopPolling();
-  tray.destroy();
+  appContainer.notifier?.stopPolling();
+  appContainer.tray?.destroy();
 });
+
+Menu.setApplicationMenu(null);
 
 app
   .whenReady()
-  .then(() => {
-    notifier = initNotifierCore();
-    
-    tray = new Tray(getAssetPath(app, 'icon.ico'))
+  .then(async () => {
+    startServer(appContainer, isDebug);
 
-    const contextMenu = Menu.buildFromTemplate([
-      { label: 'Open', click: () => {
-        if (!mainWindow){
-          return;
-        }
+    appContainer.notifier = initNotifierCore();
+    appContainer.tray = createTray();
+    appContainer.mainWindow = await createWindow();
 
-        mainWindow.show();
-      }},
-      { label: 'Quit', click: () => {
-        isQuiting = true;
-        app.quit();
-      }}
-    ])
-
-    tray.on('double-click', () => {
-      if (!mainWindow){
-        return;
-      }
-
-      mainWindow.show();
-    })
-    
-    tray.setToolTip('Twitch Notifier')
-    tray.setContextMenu(contextMenu)
-
-    createWindow();
-
-    app.on('activate', () => {
+    app.on('activate', async () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
-      if (mainWindow === null) createWindow();
+      if (appContainer.mainWindow === null) {
+        appContainer.mainWindow = await createWindow();
+      }
     });
   })
   .catch(console.log);
 
-ipcMain.on('request_token', async (event) => {
-  event.reply('token_updated', initAccessToken());
-});
+ipcMain.handle('request_token', () => {
+  return initAccessToken();
+})
 
 ipcMain.on('remove_token', async () => {
-  notifier.stopPolling();
+  appContainer.notifier?.stopPolling();
   removeAccessToken();
 });
-
-const expressServer = express();
-
-expressServer.use(express.static(path.resolve(__dirname, '../renderer')));
-
-if (isDebug){
-  var cors = require('cors');
-
-  expressServer.use(cors({
-    origin: 'http://localhost:1212'
-  }));
-
-  expressServer.get('/auth*', (_req, _res) => {
-    _res.redirect('http://localhost:1212/auth.html');
-  });
-}
-
-expressServer.get('/access_gathered', (_req, _res) => {
-  _res.status(200);
-  _res.send();
-
-  console.log("***Got access token");
-
-  const token = _req.query.access_token as string;
-
-  notifier.updateToken(token);
-  updateAccessToken(token);
-
-  if (!mainWindow){
-    return;
-  }
-
-  mainWindow.webContents.send("token_updated", token);
-  mainWindow.focus();
-});
-
-expressServer.listen(1213);

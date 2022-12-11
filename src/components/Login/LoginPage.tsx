@@ -1,6 +1,6 @@
 import { Button } from "antd";
 import { useAuthRedirect } from "customHooks/useAuthRedirect";
-import { CLIENT_ID } from "main/client-id";
+import { CLIENT_ID } from "constants/client-id";
 
 export const LoginPage = () => {
     useAuthRedirect();

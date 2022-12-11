@@ -13,11 +13,16 @@ root.render(
   </Provider>
 );
 
-window.electron.ipcRenderer.sendMessage('request_token', []);
-window.electron.ipcRenderer.on('token_updated', (arg) => {
-  if (!arg){
+const onTokenUpdated = (token?: string) => {
+  if (!token){
     return;
   }
 
-  store.dispatch(setAuthToken(arg as string));
-});
+  store.dispatch(setAuthToken(token));
+}
+
+window.electron.ipcRenderer.invoke('request_token', [])
+  .then( arg => onTokenUpdated(arg as string));
+
+window.electron.ipcRenderer
+  .on('token_updated', arg => onTokenUpdated(arg as string));
