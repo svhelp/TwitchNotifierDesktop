@@ -1,5 +1,5 @@
-import { ipcMain, safeStorage } from "electron";
-import { readStorage, removeStorage, writeStorage } from "./storage";
+import { safeStorage } from "electron";
+import { readStorage, removeStorage, writeStorage } from "../utils/storage";
 
 export const storageTokenKey = "accessToken";
 
@@ -23,8 +23,6 @@ export const updateAccessToken = (value: string | undefined) => {
         const encryptedToken = safeStorage.encryptString(value);
         writeStorage(storageTokenKey, encryptedToken);
     }
-
-    ipcMain.emit("token_updated", value);
 };
 
 export const removeAccessToken = () => {

@@ -1,8 +1,8 @@
 import { GetFollowedStreamsApiResponse, GetUsersApiResponse, IStreamInfo } from "api/models";
 import axios from "axios";
 import {Notification} from "electron";
-import { CLIENT_ID } from "./client-id";
-import { initAccessToken } from "./tokenStorage";
+import { CLIENT_ID } from "../../constants/client-id";
+import { initAccessToken } from "./token-storage";
 
 export interface INotifierCore {
     updateToken: (newToken: string | undefined) => void;

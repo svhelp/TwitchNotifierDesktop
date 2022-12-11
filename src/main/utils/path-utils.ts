@@ -6,7 +6,7 @@ import { App } from 'electron';
 export const getAssetPath = (app: App, ...paths: string[]): string => {
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
-    : path.join(__dirname, '../../assets');
+    : path.join(__dirname, '../../../assets');
 
   return path.join(RESOURCES_PATH, ...paths);
 };
@@ -18,5 +18,5 @@ export const resolveHtmlPath = (htmlFileName: string) => {
     url.pathname = htmlFileName;
     return url.href;
   }
-  return `file://${path.resolve(__dirname, '../renderer/', htmlFileName)}`;
+  return `file://${path.resolve(__dirname, '../../renderer/', htmlFileName)}`;
 }
