@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { CLIENT_ID } from "constants/client-id";
-import { RootState } from "renderer/store";
+import type { RootState } from "renderer/store";
 import { GetUsersApiResponse, GetUsersApiModel, GetFollowedStreamsApiResponse, GetFollowedStreamsApiModel } from "./models";
 
 export const twitchApi = createApi({

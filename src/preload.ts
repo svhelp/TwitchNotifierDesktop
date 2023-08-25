@@ -1,6 +1,24 @@
+// See the Electron documentation for details on how to use preload scripts:
+// https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
+
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels = 'remove_token' | 'request_token' | 'token_updated';
+
+declare global {
+    interface Window {
+      electron: {
+        ipcRenderer: {
+          sendMessage(channel: Channels, args: unknown[]): void;
+          on(
+            channel: Channels,
+            func: (...args: unknown[]) => void
+          ): (() => void) | undefined;
+          invoke(channel: Channels, args: unknown[]): Promise<any>;
+        };
+      };
+    }
+}
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {

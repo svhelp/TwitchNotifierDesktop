@@ -1,6 +1,6 @@
 import { createDraftSafeSelector, createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
-import { RootState } from 'renderer/store';
+import type { RootState } from 'renderer/store';
 
 export interface MainLayoutState {
   authToken?: string;

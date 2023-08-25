@@ -9,7 +9,9 @@
     <title>Twitch Notifier</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div>
+      Authenticated successfuly.
+    </div>
     <script>
       fetch('http://localhost:1213/access_gathered?' + document.location.hash.slice(1))
         .then(() => window.close())

@@ -1,8 +1,8 @@
 import { setAuthToken } from 'components/logic/slice';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import App from '../components/App';
-import { store } from './store';
+import App from 'components/App';
+import { store } from 'renderer/store';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -22,7 +22,7 @@ const onTokenUpdated = (token?: string) => {
 }
 
 window.electron.ipcRenderer.invoke('request_token', [])
-  .then( arg => onTokenUpdated(arg as string));
+  .then(arg => onTokenUpdated(arg as string));
 
 window.electron.ipcRenderer
   .on('token_updated', arg => onTokenUpdated(arg as string));

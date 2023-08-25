@@ -1,7 +1,7 @@
-import { GetFollowedStreamsApiResponse, GetUsersApiResponse, IStreamInfo } from "api/models";
+import { GetFollowedStreamsApiResponse, GetUsersApiResponse, IStreamInfo } from "../api/models";
 import axios from "axios";
 import {Notification} from "electron";
-import { CLIENT_ID } from "../../constants/client-id";
+import { CLIENT_ID } from "../constants/client-id";
 import { initAccessToken } from "./token-storage";
 
 export interface INotifierCore {
@@ -35,8 +35,8 @@ const notify = (newStreams: IStreamInfo[], changedStreams: IStreamInfo[]) => {
 }
 
 const compareStreams = (oldStreamsData: IStreamInfo[], newStreamsData: IStreamInfo[]) => {
-    let newStreams: IStreamInfo[] = [];
-    let changedStreams: IStreamInfo[] = [];
+    const newStreams: IStreamInfo[] = [];
+    const changedStreams: IStreamInfo[] = [];
 
     for (const stream of newStreamsData){
         const oldStream = oldStreamsData.find(s => s.id === stream.id);
@@ -123,7 +123,7 @@ const startPolling = async (token: string) => {
 
 export const initNotifierCore = () => {
     log("Initialization.");
-    let pollingInterval: NodeJS.Timer | undefined;
+    let pollingInterval: NodeJS.Timeout | undefined;
     let accessToken: string | undefined;
 
     const stopPolling = () => {

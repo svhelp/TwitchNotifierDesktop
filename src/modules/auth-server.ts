@@ -2,7 +2,7 @@
 import path from 'path';
 import express from 'express';
 import { updateAccessToken } from './token-storage';
-import { IAppContainer } from 'main/interfaces';
+import { IAppContainer } from '../interfaces';
 
 const log = (message: string) => {
     console.log(`***Auth service: ${message}`);
@@ -29,8 +29,11 @@ const updateWindowToken = (appContainer: IAppContainer, token: string) => {
   appContainer.mainWindow.focus();
 }
 
-export const startServer = (appContainer: IAppContainer, isDebug?: boolean) => {
+export const startServer = (appContainer: IAppContainer) => {
   log("Starting server.");
+
+  const isDebug =
+    process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
   const expressServer = express();
 
