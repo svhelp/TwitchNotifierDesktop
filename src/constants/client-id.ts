@@ -1,1 +1,0 @@
-export const CLIENT_ID = 'he7tgfawz348hfxlmbmcns78mnrf5l';

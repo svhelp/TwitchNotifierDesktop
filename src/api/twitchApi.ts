@@ -1,5 +1,4 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { CLIENT_ID } from "constants/client-id";
 import type { RootState } from "renderer/store";
 import { GetUsersApiResponse, GetUsersApiModel, GetFollowedStreamsApiResponse, GetFollowedStreamsApiModel } from "./models";
 
@@ -10,7 +9,7 @@ export const twitchApi = createApi({
       prepareHeaders: (headers, { getState }) => {
         const token = (getState() as RootState).mainLayoutReducer.authToken;
 
-        headers.set('Client-Id', CLIENT_ID);
+        headers.set('Client-Id', process.env.TWITCH_API_KEY);
     
         // If we have a token set in state, let's assume that we should be passing it.
         if (token) {
