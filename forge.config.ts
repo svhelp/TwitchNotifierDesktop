@@ -12,6 +12,10 @@ import { rendererConfig } from './webpack.renderer.config';
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    extraResource: [
+      "./assets",
+      "./static"
+    ]
   },
   rebuildConfig: {},
   makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
@@ -19,7 +23,6 @@ const config: ForgeConfig = {
     new AutoUnpackNativesPlugin({}),
     new WebpackPlugin({
       mainConfig,
-      //devContentSecurityPolicy: "connect-src 'self' https://api.myapp.com 'unsafe-eval'",
       renderer: {
         config: rendererConfig,
         entryPoints: [

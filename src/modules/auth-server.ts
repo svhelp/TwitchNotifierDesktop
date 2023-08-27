@@ -1,8 +1,9 @@
 
-import path from 'path';
 import express from 'express';
 import { updateAccessToken } from './token-storage';
 import { IAppContainer } from '../interfaces';
+import { getStaticPath } from 'utils/path-utils';
+import { app } from 'electron';
 
 const log = (message: string) => {
     console.log(`***Auth service: ${message}`);
@@ -32,24 +33,9 @@ const updateWindowToken = (appContainer: IAppContainer, token: string) => {
 export const startServer = (appContainer: IAppContainer) => {
   log("Starting server.");
 
-  const isDebug =
-    process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
-
   const expressServer = express();
 
-  expressServer.use(express.static(path.resolve(__dirname, '../renderer')));
-  
-  if (isDebug){
-    var cors = require('cors');
-  
-    expressServer.use(cors({
-      origin: 'http://localhost:1212'
-    }));
-  
-    expressServer.get('/auth*', (_req, _res) => {
-      _res.redirect('http://localhost:1212/auth.html');
-    });
-  }
+  expressServer.use(express.static(getStaticPath(app)));
   
   expressServer.get('/access_gathered', (_req, _res) => {
     _res.status(200);
