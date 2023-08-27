@@ -122,7 +122,7 @@ app.on('ready', async () => {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        'Content-Security-Policy': ['default-src \'self\'; style-src \'unsafe-inline\'; connect-src \'self\' api.twitch.tv; img-src \'self\' *.jtvnw.net']
+        'Content-Security-Policy': ['default-src \'self\'; style-src \'unsafe-inline\'; connect-src \'self\' https://api.twitch.tv/; img-src \'self\' https://*.jtvnw.net/']
       }
     })
   })
