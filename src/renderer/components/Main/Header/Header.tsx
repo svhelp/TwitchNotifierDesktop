@@ -1,6 +1,6 @@
 import { Dropdown, Avatar, Image, MenuProps, Skeleton } from "antd"
-import { useLogOut } from "customHooks/useLogOut";
-import { useUserData } from "customHooks/useUserData";
+import { useLogOut } from "renderer/customHooks/useLogOut";
+import { useUserData } from "renderer/customHooks/useUserData";
 import styled from "styled-components"
 
 export const HeaderContent = () => {

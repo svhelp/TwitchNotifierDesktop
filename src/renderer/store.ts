@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { twitchApi } from 'api/twitchApi'
-import mainLayoutReducer from 'components/logic/slice'
+import { twitchApi } from 'renderer/api/twitchApi'
+import mainLayoutReducer from 'renderer/logic/slice'
 
 export const store = configureStore({
   reducer: {

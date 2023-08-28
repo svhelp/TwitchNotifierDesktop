@@ -1,5 +1,5 @@
 import { BrowserWindow, Tray } from "electron";
-import { INotifierCore } from "./modules/notifier-core";
+import { INotifierCore } from "./main/modules/notifier-core";
 
 export interface IAppContainer {
   mainWindow: BrowserWindow | null;

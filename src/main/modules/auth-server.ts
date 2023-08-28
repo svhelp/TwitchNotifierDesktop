@@ -1,9 +1,8 @@
 
 import express from 'express';
 import { updateAccessToken } from './token-storage';
-import { IAppContainer } from '../interfaces';
-import { getStaticPath } from 'utils/path-utils';
-import { app } from 'electron';
+import { IAppContainer } from 'interfaces';
+import { getStaticPath } from 'main/utils/path-utils';
 
 const log = (message: string) => {
     console.log(`***Auth service: ${message}`);
@@ -35,7 +34,7 @@ export const startServer = (appContainer: IAppContainer) => {
 
   const expressServer = express();
 
-  expressServer.use(express.static(getStaticPath(app)));
+  expressServer.use(express.static(getStaticPath()));
   
   expressServer.get('/access_gathered', (_req, _res) => {
     _res.status(200);

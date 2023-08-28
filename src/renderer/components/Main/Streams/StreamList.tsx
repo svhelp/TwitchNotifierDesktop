@@ -1,4 +1,4 @@
-import { useGetFollowedStreamsQuery, useGetUsersQuery } from "api/twitchApi";
+import { useGetFollowedStreamsQuery, useGetUsersQuery } from "renderer/api/twitchApi";
 import styled from "styled-components";
 import { StreamInfo } from "./StreamInfo";
 

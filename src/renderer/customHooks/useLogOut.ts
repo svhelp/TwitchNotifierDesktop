@@ -1,4 +1,4 @@
-import { logOut } from "components/logic/slice";
+import { logOut } from "renderer/logic/slice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 

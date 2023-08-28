@@ -1,6 +1,6 @@
 import { Layout } from "antd"
 import { Header, Content } from "antd/es/layout/layout"
-import { useAuthRedirect } from "customHooks/useAuthRedirect"
+import { useAuthRedirect } from "renderer/customHooks/useAuthRedirect"
 import { HeaderContent } from "./Header/Header"
 import { StreamList } from "./Streams/StreamList"
 

@@ -1,7 +1,7 @@
-import { setAuthToken } from 'components/logic/slice';
+import { setAuthToken } from './logic/slice';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import App from 'components/App';
+import App from './components/App';
 import { store } from 'renderer/store';
 
 const container = document.getElementById('root')!;

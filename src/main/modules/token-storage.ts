@@ -1,5 +1,5 @@
 import { safeStorage } from "electron";
-import { readStorage, removeStorage, writeStorage } from "../utils/storage";
+import { readStorage, removeStorage, writeStorage } from "main/utils/storage";
 
 export const storageTokenKey = "accessToken";
 

@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { RootState } from "renderer/store";
-import { GetUsersApiResponse, GetUsersApiModel, GetFollowedStreamsApiResponse, GetFollowedStreamsApiModel } from "./models";
+import { GetUsersApiResponse, GetUsersApiModel, GetFollowedStreamsApiResponse, GetFollowedStreamsApiModel, TwitchBaseUrl } from "api-domain/models";
 
 export const twitchApi = createApi({
     reducerPath: 'twitchApi',
     baseQuery: fetchBaseQuery({
-      baseUrl: 'https://api.twitch.tv/helix/',
+      baseUrl: TwitchBaseUrl,
       prepareHeaders: (headers, { getState }) => {
         const token = (getState() as RootState).mainLayoutReducer.authToken;
 

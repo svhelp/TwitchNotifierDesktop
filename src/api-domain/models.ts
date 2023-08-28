@@ -1,3 +1,5 @@
+export const TwitchBaseUrl = 'https://api.twitch.tv/helix/'
+
 export type GetUsersApiModel = {
     id?: string;
     login?: string;

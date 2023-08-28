@@ -1,5 +1,5 @@
-import { LoginPage } from 'components/Login/LoginPage';
-import { MainLayout } from 'components/Main/MainLayout';
+import { LoginPage } from './Login/LoginPage';
+import { MainLayout } from './Main/MainLayout';
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { ErrorPage } from './Error/ErrorPage';
 

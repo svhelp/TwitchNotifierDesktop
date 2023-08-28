@@ -1,5 +1,5 @@
 import { Button, Result } from "antd"
-import { useLogOut } from "customHooks/useLogOut";
+import { useLogOut } from "renderer/customHooks/useLogOut";
 
 export const ErrorPage = () => {
     const onLogOut = useLogOut();

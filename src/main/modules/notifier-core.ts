@@ -1,4 +1,4 @@
-import { GetFollowedStreamsApiResponse, GetUsersApiResponse, IStreamInfo } from "../api/models";
+import { GetFollowedStreamsApiResponse, GetUsersApiResponse, IStreamInfo } from "api-domain/models";
 import axios from "axios";
 import {Notification} from "electron";
 import { initAccessToken } from "./token-storage";
