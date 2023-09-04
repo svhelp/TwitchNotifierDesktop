@@ -1,7 +1,8 @@
 import { MessageBoxOptions, app, autoUpdater, dialog } from 'electron';
+import log from "electron-log"
 
 export const configureUpdater = () => {
-  const server = 'hazel-update-server-kqwgtga10-svhelp.vercel.app'
+  const server = 'https://hazel-update-server-six.vercel.app'
   const url = `${server}/update/${process.platform}/${app.getVersion()}`
 
   autoUpdater.setFeedURL({ url })
@@ -26,6 +27,9 @@ export const configureUpdater = () => {
   })
 
   autoUpdater.on('error', (message) => {
+    log.error('There was a problem updating the application')
+    log.error(message)
+
     console.error('There was a problem updating the application')
     console.error(message)
   })
