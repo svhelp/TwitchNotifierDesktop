@@ -1,8 +1,18 @@
 import { MessageBoxOptions, app, autoUpdater, dialog } from 'electron';
-import log from "electron-log"
+import report from "electron-log"
+
+const server = process.env.UPDATE_SERVER
+
+const log = (message: unknown) => {
+  console.log(`***Updater service: ${message}`);
+}
 
 export const configureUpdater = () => {
-  const server = 'https://hazel-update-server-six.vercel.app'
+  if (!app.isPackaged || !server) {
+    log('Updater configuration skipped.')
+    return;
+  }
+
   const url = `${server}/update/${process.platform}/${app.getVersion()}`
 
   autoUpdater.setFeedURL({ url })
@@ -27,10 +37,10 @@ export const configureUpdater = () => {
   })
 
   autoUpdater.on('error', (message) => {
-    log.error('There was a problem updating the application')
-    log.error(message)
+    report.error('There was a problem updating the application')
+    report.error(message)
 
-    console.error('There was a problem updating the application')
-    console.error(message)
+    log('There was a problem updating the application.')
+    log(message)
   })
 }

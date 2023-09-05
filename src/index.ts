@@ -12,6 +12,8 @@ import { getAssetPath } from 'main/utils/path-utils';
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
+const appId = "com.squirrel.twitch.notifier.desktop.TwitchNotifier";
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -25,9 +27,12 @@ const appContainer: IAppContainer = {
   tray: null
 }
 
-if (app.isPackaged) {
-  configureUpdater();
+if (process.platform === 'win32')
+{
+  app.setAppUserModelId(appId)
 }
+
+configureUpdater();
 
 const createTray = () => {
   const tray = new Tray(getAssetPath('icon.ico'))
@@ -100,8 +105,10 @@ const createWindow = async () => {
     return { action: 'deny' };
   });
   
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  if (!app.isPackaged) {
+    // Open the DevTools.
+    mainWindow.webContents.openDevTools();
+  }
 
   return mainWindow;
 };
