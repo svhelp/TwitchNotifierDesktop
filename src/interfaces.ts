@@ -5,4 +5,5 @@ export interface IAppContainer {
   mainWindow: BrowserWindow | null;
   tray: Tray | null;
   notifier: INotifierCore | null;
+  isQuitting: boolean;
 }

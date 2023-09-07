@@ -1,6 +1,6 @@
 
 import express from 'express';
-import { updateAccessToken } from './token-storage';
+import { updateAccessToken } from 'main/utils/token-storage';
 import { IAppContainer } from 'interfaces';
 import { getStaticPath } from 'main/utils/path-utils';
 
