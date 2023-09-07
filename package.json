@@ -1,7 +1,7 @@
 {
   "name": "twitch.notifier.desktop",
   "productName": "Twitch Notifier",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A Twitch stream notification desktop application",
   "main": ".webpack/main",
   "scripts": {
